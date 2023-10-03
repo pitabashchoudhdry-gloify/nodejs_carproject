@@ -26,7 +26,7 @@ const adminusermiddleware= errorCustom(
             },
           });
           if (userAvailable) {
-            const err = new CustomError("User already registered!", 400);
+            const err = new CustomError("Admin already registered!", 400);
             next(err);
           }else{
 
@@ -46,7 +46,7 @@ const adminusermiddleware= errorCustom(
           if (k) {
              res.status(201).json({ id: k.id, email: k.email });
           } else {
-            const err = new CustomError("User data is not valid", 400);
+            const err = new CustomError("Admin data is not valid", 400);
             next(err);
             
           }
