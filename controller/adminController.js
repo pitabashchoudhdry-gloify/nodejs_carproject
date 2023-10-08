@@ -7,7 +7,7 @@ const CustomError = require("../utils/customError");
 const adminUser =require("../model/adminModel");
 
 
-const adminusermiddleware= errorCustom(
+const adminuserregister= errorCustom(
     async (req, res, next)=>{
 
         const {name,email,phone,password}=req.body;
@@ -54,5 +54,51 @@ const adminusermiddleware= errorCustom(
 }
 );
 
+const adminuserlogin=errorCustom(
+  async (req, res, next)=>{
+    const {email,password}=req.body;
+    if ( !email || !password) {
+        const customError = new CustomError("All fields are mandatory!", 400);
+    
+        next(customError);
+      }
+      const userAvailable = await adminUser.findOne({
+        where: {
+          email: {
+            [Op.eq]: email,
+          },
+        },
+      });
+        //compare password with hashedpassword
+  //&& (await bcrypt.compare(password, existingUser.user_password)
+  if (
+    userAvailable &&
+    (await bcrypt.compare(password, userAvailable.password))
+  ) {
+    const accessToken = jwt.sign(
+      {
+        userData: {
+          username: userAvailable.name,
+          email: userAvailable.email,
+          id: userAvailable.id,
+        },
+      },
+      process.env.ACCESS_TOKEN_SECERT,
+      { expiresIn: "15m" }
+    );
 
-module.exports=adminusermiddleware;
+    res.status(200).json(accessToken);
+  } else {
+    const customError = new CustomError("email or password is not valid", 401);
+
+    next(customError);
+  }
+     
+  }
+);
+
+const adminUserDetails = errorCustom(async (req, res) => {
+  res.status(200).json(req.user);
+});
+
+module.exports={adminuserregister,adminuserlogin, adminUserDetails};

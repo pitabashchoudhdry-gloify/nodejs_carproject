@@ -19,8 +19,6 @@ const validateToken = errorCustom(
   if (authHeader && authHeader.startsWith("Bearer")) {
     token = authHeader.split(" ")[1];
    
-   
-
     if (!token || token=="") {
       
 
@@ -28,7 +26,8 @@ const validateToken = errorCustom(
       
       next(customError);
     }
-    else{
+    else
+    {
        jwt.verify(token, process.env.ACCESS_TOKEN_SECERT, (err, decoded) => {
         if (err) {
          
